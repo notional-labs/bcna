@@ -40,7 +40,7 @@ wget -O ~/.bcnad/config/genesis.json https://raw.githubusercontent.com/BitCannaG
 # Get "trust_hash" and "trust_height".
 INTERVAL=1000
 LATEST_HEIGHT=$(curl -s http://95.216.242.82:36657/block | jq -r .result.block.header.height)
-BLOCK_HEIGHT=$(($LATEST_HEIGHT-$INTERVAL)) 
+BLOCK_HEIGHT=$((LATEST_HEIGHT-INTERVAL))
 TRUST_HASH=$(curl -s "http://95.216.242.82:36657/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
 
 # Print out block and transaction hash from which to sync state.
@@ -55,7 +55,8 @@ export BCNAD_STATESYNC_TRUST_HEIGHT=$BLOCK_HEIGHT
 export BCNAD_STATESYNC_TRUST_HASH=$TRUST_HASH
 
 # Fetch and set list of seeds from chain registry.
-export BCNAD_P2P_SEEDS=$(curl -s https://raw.githubusercontent.com/cosmos/chain-registry/master/bitcanna/chain.json | jq -r '[foreach .peers.seeds[] as $item (""; "\($item.id)@\($item.address)")] | join(",")')
+BCNAD_P2P_SEEDS=$(curl -s https://raw.githubusercontent.com/cosmos/chain-registry/master/bitcanna/chain.json | jq -r '[foreach .peers.seeds[] as $item (""; "\($item.id)@\($item.address)")] | join(",")')
+export BCNAD_P2P_SEEDS
 
 # Start chain.
 bcnad start --x-crisis-skip-assert-invariants 
